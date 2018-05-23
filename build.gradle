@@ -6,7 +6,8 @@ buildscript {
     google()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.3.3'
+  classpath 'com.android.tools.build:gradle:3.1.2'
+
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
   }
@@ -17,6 +18,21 @@ allprojects {
     jcenter()
     maven { url 'https://jitpack.io' }
     google()
+  }
+
+  ext {
+    compileSdkVersion = 27
+    dagger_version = "2.14.1"
+    glide_version = "4.7.1"
+    minSdkVersion = 18
+    targetSdkVersion = 27
+    javaVersion = JavaVersion.VERSION_1_8
+    android_support_version='27.1.1'
+    rx_java_version='2.1.8'
+    rx_android_support_version='2.0.1'
+    annotation_epoxy='com.airbnb.android:epoxy-processor:2.9.0'
+    annotation_butter='com.jakewharton:butterknife-compiler:8.8.1'
+    epoxy='com.airbnb.android:epoxy:2.9.0'
   }
 }
 

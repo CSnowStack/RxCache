@@ -12,13 +12,12 @@ buildscript {
 }
 
 android {
-  compileSdkVersion 23
-  buildToolsVersion '26.0.2'
+  compileSdkVersion 26
 
   defaultConfig {
     applicationId "victoralbertos.io.android"
     minSdkVersion 16
-    targetSdkVersion 23
+    targetSdkVersion 26
     versionCode 1
     versionName "1.0"
   }
@@ -31,19 +30,32 @@ android {
   lintOptions {
     abortOnError false
   }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
-  compile project(':runtime')
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation project(':runtime')
   annotationProcessor project(':compiler')
-  compile 'com.github.VictorAlbertos.Jolyglot:gson:0.0.4'
+  implementation 'com.github.VictorAlbertos.Jolyglot:gson:0.0.4'
 
-  testCompile 'junit:junit:4.12'
+  testImplementation 'junit:junit:4.12'
 
   annotationProcessor "com.google.dagger:dagger-compiler:2.14.1"
-  compile "com.google.dagger:dagger:2.14.1"
-  provided "org.glassfish:javax.annotation:10.0-b28"
+  implementation "com.google.dagger:dagger:2.14.1"
+  compileOnly "org.glassfish:javax.annotation:10.0-b28"
+
+  //rxjava
+  implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rx_android_support_version}"
+  implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rx_java_version}"
+  //网络库
+  implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+  implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+  implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
 }
 
 

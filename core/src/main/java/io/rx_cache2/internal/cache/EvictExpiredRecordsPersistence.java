@@ -16,24 +16,32 @@
 
 package io.rx_cache2.internal.cache;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import io.reactivex.Observable;
 import io.rx_cache2.internal.Memory;
 import io.rx_cache2.internal.Persistence;
 import io.rx_cache2.internal.Record;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public final class EvictExpiredRecordsPersistence extends Action {
   private final HasRecordExpired hasRecordExpired;
   private final String encryptKey;
 
+  /**
+   * 读的文件且已过期,但是设置了useExpiredDataIfLoaderNotAvailable 就不删除缓存文件
+   */
+  private final Boolean useExpiredDataIfLoaderNotAvailable;
+
   @Inject public EvictExpiredRecordsPersistence(Memory memory, Persistence persistence,
-      HasRecordExpired hasRecordExpired, String encryptKey) {
+      HasRecordExpired hasRecordExpired, String encryptKey,boolean useExpiredDataIfLoaderNotAvailable) {
     super(memory, persistence);
     this.hasRecordExpired = hasRecordExpired;
     this.encryptKey = encryptKey;
+    this.useExpiredDataIfLoaderNotAvailable=useExpiredDataIfLoaderNotAvailable;
   }
 
   public Observable<Integer> startEvictingExpiredRecords() {
@@ -46,7 +54,7 @@ public final class EvictExpiredRecordsPersistence extends Action {
         record = persistence.retrieveRecord(key, true, encryptKey);
       }
 
-      if (record != null && hasRecordExpired.hasRecordExpired(record)) {
+      if (record != null && hasRecordExpired.hasRecordExpired(record)&&!useExpiredDataIfLoaderNotAvailable) {
         persistence.evict(key);
       }
     }
