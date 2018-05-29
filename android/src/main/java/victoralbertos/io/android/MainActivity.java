@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
@@ -19,7 +17,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.rx_cache2.DynamicKey;
 import io.rx_cache2.EvictProvider;
-import io.rx_cache2.IsShouldSaveListener;
 import io.rx_cache2.internal.RxCache;
 import io.victoralbertos.jolyglot.GsonSpeaker;
 import okhttp3.OkHttpClient;
@@ -50,20 +47,11 @@ public class MainActivity extends Activity {
 
 
         RxCacheProvider rxCacheProvider = new RxCache.Builder()
-                .setIsShouldSaveListener(new IsShouldSaveListener() {
-                    @Override public boolean shouldSave(String result) {
-                        try {
-                            JSONObject jsonObject=new JSONObject(result);
-
-                            if("1".equals(jsonObject.getString("error"))){
-                                return true;
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        return false;
+                .setIsShouldSaveListener(result -> {
+                    if (result.contains("\"error\":0,")) {
+                        return true;
                     }
+                    return false;
                 })
                 .useExpiredDataIfLoaderNotAvailable(true)
                 .persistence(getApplication().getFilesDir(), new GsonSpeaker())
@@ -71,14 +59,10 @@ public class MainActivity extends Activity {
         Gson gson = new Gson();
 
 
-        GsonTypeToken gsonTypeToken=new GsonTypeToken<BaseResult<List<HomeBannerBean>>>() {};
-
-
-
-
-        Log.e("-->>", "是否刷新数据 " + (!isUnable()));
         rxCacheProvider.getBanner1(api.getBanner1(), new DynamicKey("21"), new EvictProvider(!isUnable()))
                 .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(data -> {
                     Log.e("data", new Gson().toJson(data));
