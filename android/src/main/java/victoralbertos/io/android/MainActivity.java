@@ -47,12 +47,7 @@ public class MainActivity extends Activity {
 
 
         RxCacheProvider rxCacheProvider = new RxCache.Builder()
-                .setIsShouldSaveListener(result -> {
-                    if (result.contains("\"error\":0,")) {
-                        return true;
-                    }
-                    return false;
-                })
+                .setIsShouldSaveListener(result -> result.contains("\"error\":0,"))
                 .useExpiredDataIfLoaderNotAvailable(true)
                 .persistence(getApplication().getFilesDir(), new GsonSpeaker())
                 .using(RxCacheProvider.class);
@@ -88,11 +83,7 @@ public class MainActivity extends Activity {
 
         NetworkInfo networkinfo = manager.getActiveNetworkInfo();
 
-        if (networkinfo == null || !networkinfo.isAvailable()) {
-            return true;
-        }
-
-        return false;
+        return networkinfo == null || !networkinfo.isAvailable();
 
 
     }
