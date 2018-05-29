@@ -16,22 +16,26 @@
 
 package io.rx_cache2.internal;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
+import io.rx_cache2.IsShouldSaveListener;
 import io.rx_cache2.MigrationCache;
 import io.rx_cache2.internal.cache.memory.ReferenceMapMemory;
 import io.rx_cache2.internal.encrypt.BuiltInEncryptor;
 import io.rx_cache2.internal.encrypt.Encryptor;
 import io.victoralbertos.jolyglot.JolyglotGenerics;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Singleton;
 
 @Module
 public final class RxCacheModule {
   private final File cacheDirectory;
   private final boolean useExpiredDataIfLoaderNotAvailable;
+  private final IsShouldSaveListener isShouldSaveListener;
   private final Integer maxMgPersistenceCache;
   private final String encryptKey;
   private final List<MigrationCache> migrations;
@@ -39,13 +43,15 @@ public final class RxCacheModule {
 
   public RxCacheModule(File cacheDirectory, Boolean useExpiredDataIfLoaderNotAvailable,
       Integer maxMgPersistenceCache,
-      String encryptKey, List<MigrationCache> migrations, JolyglotGenerics jolyglot) {
+      String encryptKey, List<MigrationCache> migrations, JolyglotGenerics jolyglot,
+                       IsShouldSaveListener isShouldSaveListener) {
     this.cacheDirectory = cacheDirectory;
     this.useExpiredDataIfLoaderNotAvailable = useExpiredDataIfLoaderNotAvailable;
     this.maxMgPersistenceCache = maxMgPersistenceCache;
     this.encryptKey = encryptKey;
     this.migrations = migrations;
     this.jolyglot = jolyglot;
+    this.isShouldSaveListener=isShouldSaveListener;
   }
 
   @Singleton @Provides File provideCacheDirectory() {
@@ -55,6 +61,11 @@ public final class RxCacheModule {
   @Singleton @Provides Persistence providePersistence(io.rx_cache2.internal.Disk disk) {
     return disk;
   }
+
+  @Singleton @Provides IsShouldSaveListener provideIsShouldSaveListener() {
+    return isShouldSaveListener;
+  }
+
 
   @Singleton @Provides Boolean useExpiredDataIfLoaderNotAvailable() {
     return useExpiredDataIfLoaderNotAvailable;

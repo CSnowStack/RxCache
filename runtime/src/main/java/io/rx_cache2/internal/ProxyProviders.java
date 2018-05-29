@@ -16,21 +16,19 @@
 
 package io.rx_cache2.internal;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.Single;
-import io.rx_cache2.EncryptKey;
-import io.rx_cache2.Migration;
-import io.rx_cache2.MigrationCache;
-import io.rx_cache2.SchemeMigration;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.rx_cache2.EncryptKey;
+import io.rx_cache2.Migration;
+import io.rx_cache2.MigrationCache;
+import io.rx_cache2.SchemeMigration;
 
 public final class ProxyProviders implements InvocationHandler {
   private final io.rx_cache2.internal.ProcessorProviders processorProviders;
@@ -41,7 +39,7 @@ public final class ProxyProviders implements InvocationHandler {
         .rxCacheModule(new RxCacheModule(builder.getCacheDirectory(),
             builder.useExpiredDataIfLoaderNotAvailable(),
             builder.getMaxMBPersistenceCache(), getEncryptKey(providersClass),
-            getMigrations(providersClass), builder.getJolyglot()))
+            getMigrations(providersClass), builder.getJolyglot(),builder.getIsShouldSaveListener()))
         .build().providers();
 
     proxyTranslator = new ProxyTranslator();
@@ -79,18 +77,8 @@ public final class ProxyProviders implements InvocationHandler {
 
         if (methodType == Observable.class) return Observable.just(observable);
 
-        if (methodType == Single.class) return Observable.just(Single.fromObservable(observable));
-
-        if (methodType == Maybe.class) {
-          return Observable.just(Maybe.fromSingle(Single.fromObservable(observable)));
-        }
-
-        if (method.getReturnType() == io.reactivex.Flowable.class) {
-          return Observable.just(observable.toFlowable(BackpressureStrategy.MISSING));
-        }
-
         String errorMessage = method.getName() + io.rx_cache2.internal.Locale.INVALID_RETURN_TYPE;
-        throw new RuntimeException(errorMessage);
+        return Observable.error(new RuntimeException(errorMessage));
       }
     }).blockingFirst();
   }

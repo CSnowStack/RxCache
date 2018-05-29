@@ -27,13 +27,14 @@ public final class ConfigProvider {
   private final boolean expirable;
   private final boolean encrypted;
   private final String dynamicKey, dynamicKeyGroup;
-  private final Observable loaderObservable;
+  private final Observable<String> loaderObservable;
   private final EvictProvider evictProvider;
+  private final IsShouldSaveListener isShouldSaveListener;
 
   public ConfigProvider(String providerKey, Boolean useExpiredDataIfNotLoaderAvailable,
       Long lifeTime, boolean requiredDetailedResponse,
       boolean expirable, boolean encrypted, String dynamicKey, String dynamicKeyGroup,
-      Observable loaderObservable, EvictProvider evictProvider) {
+      Observable<String> loaderObservable, EvictProvider evictProvider,IsShouldSaveListener isShouldSaveListener) {
     this.providerKey = providerKey;
     this.useExpiredDataIfNotLoaderAvailable = useExpiredDataIfNotLoaderAvailable;
     this.lifeTime = lifeTime;
@@ -44,6 +45,7 @@ public final class ConfigProvider {
     this.dynamicKeyGroup = dynamicKeyGroup;
     this.loaderObservable = loaderObservable;
     this.evictProvider = evictProvider;
+    this.isShouldSaveListener=isShouldSaveListener;
     checkIntegrity();
   }
 
@@ -67,7 +69,7 @@ public final class ConfigProvider {
     return requiredDetailedResponse;
   }
 
-  public Observable getLoaderObservable() {
+  public Observable<String> getLoaderObservable() {
     return loaderObservable;
   }
 
@@ -81,6 +83,10 @@ public final class ConfigProvider {
 
   public boolean isEncrypted() {
     return encrypted;
+  }
+
+  public IsShouldSaveListener getIsShouldSaveListener() {
+    return isShouldSaveListener;
   }
 
   public Boolean useExpiredDataIfNotLoaderAvailable() {

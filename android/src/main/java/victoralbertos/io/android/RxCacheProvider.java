@@ -14,6 +14,6 @@ public interface RxCacheProvider {
 
     @LifeCache(duration = 2, timeUnit = TimeUnit.MINUTES)
     Observable<String>
-    getBanner(Observable<String> info, DynamicKey dynamicKey, EvictProvider evictProvider);
+    getBanner1(Observable<String> info, DynamicKey dynamicKey, EvictProvider evictProvider);
 
 }

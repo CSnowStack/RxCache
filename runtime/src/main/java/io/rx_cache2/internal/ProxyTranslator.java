@@ -16,6 +16,12 @@
 
 package io.rx_cache2.internal;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -29,12 +35,6 @@ import io.rx_cache2.Expirable;
 import io.rx_cache2.LifeCache;
 import io.rx_cache2.ProviderKey;
 import io.rx_cache2.Reply;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Inject;
 
 public final class ProxyTranslator {
   private final Map<Method, ConfigProvider> configProviderMethodCache;
@@ -51,7 +51,7 @@ public final class ProxyTranslator {
         prev.isEncrypted(), getDynamicKey(method, objectsMethod),
         getDynamicKeyGroup(method, objectsMethod),
         getLoaderObservable(method, objectsMethod),
-        evictProvider(method, objectsMethod));
+        evictProvider(method, objectsMethod),null);
 
     return configProvider;
   }
@@ -85,15 +85,6 @@ public final class ProxyTranslator {
   private Observable getLoaderObservable(Method method, Object[] objectsMethod) {
     Observable<?> observable = getObjectFromMethodParam(method, Observable.class, objectsMethod);
     if (observable != null) return observable;
-
-    Single single = getObjectFromMethodParam(method, Single.class, objectsMethod);
-    if (single != null) return single.toObservable();
-
-    Maybe maybe = getObjectFromMethodParam(method, Maybe.class, objectsMethod);
-    if (maybe != null) return maybe.toObservable();
-
-    Flowable flowable = getObjectFromMethodParam(method, Flowable.class, objectsMethod);
-    if (flowable != null) return flowable.toObservable();
 
     String errorMessage =
         method.getName() + io.rx_cache2.internal.Locale.NOT_REACTIVE_TYPE_FOR_LOADER_WAS_FOUND;
@@ -169,7 +160,7 @@ public final class ProxyTranslator {
         result = new ConfigProvider(getProviderKey(method),
             null, getLifeTimeCache(method),
             requiredDetailResponse(method), getExpirable(method), isEncrypted(method),
-            null, null, null, null);
+            null, null, null, null,null);
         configProviderMethodCache.put(method, result);
       }
     }

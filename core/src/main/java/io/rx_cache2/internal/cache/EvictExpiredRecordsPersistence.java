@@ -44,6 +44,10 @@ public final class EvictExpiredRecordsPersistence extends Action {
     this.useExpiredDataIfLoaderNotAvailable=useExpiredDataIfLoaderNotAvailable;
   }
 
+
+  /**
+   * 开始清除过期的文件记录
+   */
   public Observable<Integer> startEvictingExpiredRecords() {
     List<String> allKeys = persistence.allKeys();
 

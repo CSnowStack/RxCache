@@ -8,10 +8,18 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.rx_cache2.DynamicKey;
 import io.rx_cache2.EvictProvider;
+import io.rx_cache2.IsShouldSaveListener;
 import io.rx_cache2.internal.RxCache;
 import io.victoralbertos.jolyglot.GsonSpeaker;
 import okhttp3.OkHttpClient;
@@ -42,18 +50,38 @@ public class MainActivity extends Activity {
 
 
         RxCacheProvider rxCacheProvider = new RxCache.Builder()
+                .setIsShouldSaveListener(new IsShouldSaveListener() {
+                    @Override public boolean shouldSave(String result) {
+                        try {
+                            JSONObject jsonObject=new JSONObject(result);
+
+                            if("1".equals(jsonObject.getString("error"))){
+                                return true;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        return false;
+                    }
+                })
                 .useExpiredDataIfLoaderNotAvailable(true)
                 .persistence(getApplication().getFilesDir(), new GsonSpeaker())
                 .using(RxCacheProvider.class);
+        Gson gson = new Gson();
 
 
-        Log.e("-->>","是否刷新数据 "+(!isUnable()));
-        rxCacheProvider.getBanner(api.getBanner(),new DynamicKey("21"),new EvictProvider(!isUnable()))
+        GsonTypeToken gsonTypeToken=new GsonTypeToken<BaseResult<List<HomeBannerBean>>>() {};
+
+
+
+
+        Log.e("-->>", "是否刷新数据 " + (!isUnable()));
+        rxCacheProvider.getBanner1(api.getBanner1(), new DynamicKey("21"), new EvictProvider(!isUnable()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(data -> {
-
-                    Log.e("data",data);
+                    Log.e("data", new Gson().toJson(data));
                 }, error -> {
                     Log.e("error  ", error.toString());
                 });
@@ -62,13 +90,10 @@ public class MainActivity extends Activity {
     }
 
 
-
-
-
     /**
      * 是否不可用
      */
-    public  boolean isUnable(){
+    public boolean isUnable() {
         ConnectivityManager manager = (ConnectivityManager)
                 getApplicationContext().getSystemService(
                         Context.CONNECTIVITY_SERVICE);

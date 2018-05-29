@@ -27,10 +27,9 @@ public interface ProcessorProviders {
   /**
    * Provide the data from RxCache
    *
-   * @param <T> the associated data
    * @return an observable based on the {@link ConfigProvider} specs.
    */
-  <T> Observable<T> process(final ConfigProvider configProvider);
+   Observable<String> process(final ConfigProvider configProvider);
 
   /**
    * Destroy the entire cache

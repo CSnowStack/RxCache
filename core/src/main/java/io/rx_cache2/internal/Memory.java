@@ -19,9 +19,9 @@ package io.rx_cache2.internal;
 import java.util.Set;
 
 public interface Memory {
-  <T> Record<T> getIfPresent(String key);
+  <T> Record getIfPresent(String key);
 
-  <T> void put(String key, Record<T> record);
+  <T> void put(String key, Record record);
 
   Set<String> keySet();
 

@@ -87,5 +87,5 @@ public interface Persistence {
    * @param encryptKey The key used to encrypt/decrypt the record to be persisted.
    * @see Record
    */
-  <T> Record<T> retrieveRecord(String key, boolean isEncrypted, String encryptKey);
+   Record retrieveRecord(String key, boolean isEncrypted, String encryptKey);
 }

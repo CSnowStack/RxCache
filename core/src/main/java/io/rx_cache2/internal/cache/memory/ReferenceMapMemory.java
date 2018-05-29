@@ -31,11 +31,11 @@ public final class ReferenceMapMemory implements Memory {
     referenceMap = Collections.synchronizedMap(new io.rx_cache2.internal.cache.memory.apache.ReferenceMap<String, Record>());
   }
 
-  @Override public <T> io.rx_cache2.internal.Record<T> getIfPresent(String key) {
+  @Override public  io.rx_cache2.internal.Record getIfPresent(String key) {
     return referenceMap.get(key);
   }
 
-  @Override public <T> void put(String key, io.rx_cache2.internal.Record<T> record) {
+  @Override public  void put(String key, io.rx_cache2.internal.Record record) {
     referenceMap.put(key, record);
   }
 

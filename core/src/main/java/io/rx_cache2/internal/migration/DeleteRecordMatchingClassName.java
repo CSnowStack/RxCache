@@ -16,9 +16,11 @@
 
 package io.rx_cache2.internal.migration;
 
-import io.reactivex.Observable;
 import java.util.List;
+
 import javax.inject.Inject;
+
+import io.reactivex.Observable;
 
 public final class DeleteRecordMatchingClassName {
   private final io.rx_cache2.internal.Persistence persistence;
@@ -44,10 +46,7 @@ public final class DeleteRecordMatchingClassName {
       io.rx_cache2.internal.Record record = persistence.retrieveRecord(key, false, encryptKey);
 
       if (record == null) {
-        record = persistence.retrieveRecord(key, true, encryptKey);
-      }
-
-      if (evictRecord(record)) {
+//        record = persistence.retrieveRecord(key, true, encryptKey);
         persistence.evict(key);
       }
     }
@@ -55,16 +54,4 @@ public final class DeleteRecordMatchingClassName {
     return Observable.just(1);
   }
 
-  private boolean evictRecord(io.rx_cache2.internal.Record record) {
-    String candidate = record.getDataClassName();
-
-    for (Class aClass : classes) {
-      String className = aClass.getName();
-      if (className.equals(candidate)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 }

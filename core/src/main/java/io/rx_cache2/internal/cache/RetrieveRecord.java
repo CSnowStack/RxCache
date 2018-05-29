@@ -24,51 +24,52 @@ import io.rx_cache2.Source;
 import io.rx_cache2.internal.Memory;
 
 public final class RetrieveRecord extends Action {
-  private final EvictRecord evictRecord;
-  private final HasRecordExpired hasRecordExpired;
-  private final String encryptKey;
+    private final EvictRecord evictRecord;
+    private final HasRecordExpired hasRecordExpired;
+    private final String encryptKey;
 
-  @Inject public RetrieveRecord(Memory memory, Persistence persistence, EvictRecord evictRecord,
-      HasRecordExpired hasRecordExpired, String encryptKey) {
-    super(memory, persistence);
-    this.evictRecord = evictRecord;
-    this.hasRecordExpired = hasRecordExpired;
-    this.encryptKey = encryptKey;
-  }
-
-  <T> Record<T> retrieveRecord(String providerKey, String dynamicKey, String dynamicKeyGroup,
-      boolean useExpiredDataIfLoaderNotAvailable, Long lifeTime, boolean isEncrypted) {
-    String composedKey = composeKey(providerKey, dynamicKey, dynamicKeyGroup);
-
-    Record<T> record = memory.getIfPresent(composedKey);
-
-    if (record != null) {
-      record.setSource(Source.MEMORY);
-    } else {
-      try {
-        record = persistence.retrieveRecord(composedKey, isEncrypted, encryptKey);
-        record.setSource(Source.PERSISTENCE);
-        memory.put(composedKey, record);
-      } catch (Exception ignore) {
-        return null;
-      }
+    @Inject public RetrieveRecord(Memory memory, Persistence persistence, EvictRecord evictRecord,
+                                  HasRecordExpired hasRecordExpired, String encryptKey) {
+        super(memory, persistence);
+        this.evictRecord = evictRecord;
+        this.hasRecordExpired = hasRecordExpired;
+        this.encryptKey = encryptKey;
     }
 
-    record.setLifeTime(lifeTime);
+     Record retrieveRecord(String providerKey, String dynamicKey, String dynamicKeyGroup,
+                                 boolean useExpiredDataIfLoaderNotAvailable, Long lifeTime, boolean isEncrypted) {
+        String composedKey = composeKey(providerKey, dynamicKey, dynamicKeyGroup);
+        //先从内存里面读
+        Record record = memory.getIfPresent(composedKey);
 
-    if (hasRecordExpired.hasRecordExpired(record)) {
-      if (!dynamicKeyGroup.isEmpty()) {
-        evictRecord.evictRecordMatchingDynamicKeyGroup(providerKey, dynamicKey,
-            dynamicKeyGroup);
-      } else if (!dynamicKey.isEmpty()) {
-        evictRecord.evictRecordsMatchingDynamicKey(providerKey, dynamicKey);
-      } else {
-        evictRecord.evictRecordsMatchingProviderKey(providerKey);
-      }
+        if (record != null) {
+            record.setSource(Source.MEMORY);
+        } else {
+            try {//从文件里面读
+                record = persistence.retrieveRecord(composedKey, isEncrypted, encryptKey);
+                record.setSource(Source.PERSISTENCE);
+                memory.put(composedKey, record);
+            } catch (Exception ignore) {
+                return null;
+            }
+        }
 
-      return useExpiredDataIfLoaderNotAvailable ? record : null;
+        record.setLifeTime(lifeTime);
+
+        //过期了 ,且未设置useExpiredDataIfLoaderNotAvailable,清除缓存文件
+        if (hasRecordExpired.hasRecordExpired(record)&&!useExpiredDataIfLoaderNotAvailable) {
+            if (!dynamicKeyGroup.isEmpty()) {
+                evictRecord.evictRecordMatchingDynamicKeyGroup(providerKey, dynamicKey,
+                        dynamicKeyGroup);
+            } else if (!dynamicKey.isEmpty()) {
+                evictRecord.evictRecordsMatchingDynamicKey(providerKey, dynamicKey);
+            } else {
+                evictRecord.evictRecordsMatchingProviderKey(providerKey);
+            }
+
+            return  null;
+        }
+
+        return record;
     }
-
-    return record;
-  }
 }

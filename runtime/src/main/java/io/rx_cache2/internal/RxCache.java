@@ -16,11 +16,13 @@
 
 package io.rx_cache2.internal;
 
-import io.reactivex.Observable;
-import io.victoralbertos.jolyglot.JolyglotGenerics;
 import java.io.File;
 import java.lang.reflect.Proxy;
 import java.security.InvalidParameterException;
+
+import io.reactivex.Observable;
+import io.rx_cache2.IsShouldSaveListener;
+import io.victoralbertos.jolyglot.JolyglotGenerics;
 
 public final class RxCache {
   private final Builder builder;
@@ -51,6 +53,7 @@ public final class RxCache {
     private Integer maxMBPersistenceCache;
     private File cacheDirectory;
     private JolyglotGenerics jolyglot;
+    private IsShouldSaveListener isShouldSaveListener;
 
     /**
      * If true RxCache will serve Records already expired, instead of evict them and throw an
@@ -72,6 +75,13 @@ public final class RxCache {
     public Builder setMaxMBPersistenceCache(Integer maxMgPersistenceCache) {
       this.maxMBPersistenceCache = maxMgPersistenceCache;
       return this;
+    }
+
+
+    public Builder setIsShouldSaveListener(IsShouldSaveListener isShouldSaveListener) {
+      this.isShouldSaveListener = isShouldSaveListener;
+      return this;
+
     }
 
     /**
@@ -104,6 +114,11 @@ public final class RxCache {
 
     public boolean useExpiredDataIfLoaderNotAvailable() {
       return useExpiredDataIfLoaderNotAvailable;
+    }
+
+
+    public IsShouldSaveListener getIsShouldSaveListener() {
+      return isShouldSaveListener;
     }
 
     public Integer getMaxMBPersistenceCache() {
