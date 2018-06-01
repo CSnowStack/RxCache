@@ -16,27 +16,32 @@
 
 package io.rx_cache2.internal.cache.memory;
 
-import java.util.Collections;
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.rx_cache2.internal.Memory;
 import io.rx_cache2.internal.Record;
 
 public final class ReferenceMapMemory implements Memory {
-  private final Map<String, io.rx_cache2.internal.Record> referenceMap;
+  private final Map<String, WeakReference<Record>> referenceMap;
 
   public ReferenceMapMemory() {
-    referenceMap = Collections.synchronizedMap(new io.rx_cache2.internal.cache.memory.apache.ReferenceMap<String, Record>());
+    referenceMap =new ConcurrentHashMap<>();
   }
 
   @Override public  io.rx_cache2.internal.Record getIfPresent(String key) {
-    return referenceMap.get(key);
+    if(referenceMap.get(key)!=null){
+      referenceMap.get(key).get();
+    }
+
+    return null;
   }
 
   @Override public  void put(String key, io.rx_cache2.internal.Record record) {
-    referenceMap.put(key, record);
+    referenceMap.put(key, new WeakReference<>(record));
   }
 
   @Override public Set<String> keySet() {

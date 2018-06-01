@@ -13,7 +13,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.rx_cache2.DynamicKey;
 import io.rx_cache2.EvictProvider;
@@ -51,6 +53,8 @@ public class MainActivity extends Activity {
                 .useExpiredDataIfLoaderNotAvailable(true)
                 .persistence(getApplication().getFilesDir(), new GsonSpeaker())
                 .using(RxCacheProvider.class);
+
+
         Gson gson = new Gson();
 
 
@@ -59,11 +63,71 @@ public class MainActivity extends Activity {
                 .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
                 }.getType()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(data -> {
-                    Log.e("data", new Gson().toJson(data));
-                }, error -> {
-                    Log.e("error  ", error.toString());
-                });
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner2(api.getBanner2(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner3(api.getBanner3(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner4(api.getBanner4(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner5(api.getBanner5(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner6(api.getBanner6(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner7(api.getBanner7(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner8(api.getBanner8(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
+
+
+        rxCacheProvider.getBanner9(api.getBanner9(), new DynamicKey("21"), new EvictProvider(!isUnable()))
+                .subscribeOn(Schedulers.io())
+                .map(s -> gson.<BaseResult<List<HomeBannerBean>>>fromJson(s, new TypeToken<BaseResult<List<HomeBannerBean>>>() {
+                }.getType()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mine);
 
 
     }
@@ -87,5 +151,25 @@ public class MainActivity extends Activity {
 
 
     }
+    
+    private Observer<BaseResult<List<HomeBannerBean>>> mine=new Observer<BaseResult<List<HomeBannerBean>>>() {
+        @Override public void onSubscribe(Disposable d) {
+
+        }
+
+        @Override public void onNext(BaseResult<List<HomeBannerBean>> listBaseResult) {
+            Log.e("onNext  ", new Gson().toJson(listBaseResult));
+
+        }
+
+        @Override public void onError(Throwable e) {
+            Log.e("error  ", e.toString());
+
+        }
+
+        @Override public void onComplete() {
+
+        }
+    };
 
 }
