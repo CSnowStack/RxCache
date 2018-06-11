@@ -23,8 +23,8 @@ apply plugin: 'idea'
 apply plugin: "net.ltgt.apt"
 apply plugin: 'maven'
 
-group = 'com.github.VictorAlbertos'
-version='1.8.0-2.x'
+group = "com.csnowstack"
+version='1.0'
 
 configurations {
   provided

@@ -1,10 +1,9 @@
 apply plugin: 'java'
-apply plugin: 'maven'
-group = 'com.github.VictorAlbertos'
-version='1.8.0-2.x'
+
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
+
 
 dependencies {
     //compile files("${System.properties['java.home']}/../lib/tools.jar")
@@ -13,24 +12,9 @@ dependencies {
     implementation project(':core')
     implementation project(':runtime')
 
-    implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    implementation 'com.google.auto.service:auto-service:1.0-rc3'
     implementation 'com.squareup:javapoet:1.9.0'
 
     testImplementation "junit:junit:4.12"
     testImplementation "com.google.testing.compile:compile-testing:0.10"
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
 }
